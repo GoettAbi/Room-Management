@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verfügbare Räume</title>
+</head>
+<body>
+    <h1>Verfügbare Räume</h1>
+    <ul>
+        {% for room in rooms %}
+        <li>
+            <h3>{{ room.name }}</h3>
+            <p>Kapazität: {{ room.capacity }} Personen</p>
+            <p>Ausstattung: {{ room.amenities }}</p>
+            <a href="{% url 'room_detail' room.id %}">Details</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,17 @@
+/* polls/static/polls/css/style.css */
+.day {
+    padding: 10px;
+    position: relative;
+}
+
+.reserved {
+    background-color: #f99; /* Hellrot für belegte Tage */
+}
+
+.reservations {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 0.8em;
+}
+

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warenkorb</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            padding: 2em;
+            text-align: center;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2em auto;
+            padding: 1em;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #1e88e5;
+        }
+        .room-summary {
+            margin: 1em 0;
+            padding: 1em;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .confirm-btn {
+            display: block;
+            width: 100%;
+            padding: 0.7em;
+            background-color: #1e88e5;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            margin-top: 1em;
+        }
+        .confirm-btn:hover {
+            background-color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Ihr Warenkorb</h1>
+</header>
+<div class="container">
+    <h2>Buchungsdetails</h2>
+    <div class="room-summary">
+        <p><strong>Raum:</strong> {{ room_name }}</p>
+        <p>Bitte bestätigen Sie Ihre Buchung.</p>
+    </div>
+    <a href="/polls/overview/" class="confirm-btn" onclick="alert('Buchung erfolgreich bestätigt!')">Buchung bestätigen</a>
+</div>
+</body>
+</html>

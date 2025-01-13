@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard: Buchungsübersicht</h1>
+
+    <h2>Bestehende Buchungen</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Raum</th>
+                <th>Datum</th>
+                <th>Gebucht von</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.room.name }}</td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.booked_by }}</td>
+                <td>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                        <button type="submit">Stornieren</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Neue Buchung hinzufügen</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="room">Raum:</label>
+        <select name="room" id="room">
+            {% for room in rooms %}
+            <option value="{{ room.id }}">{{ room.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="date">Datum:</label>
+        <input type="date" name="date" id="date" required>
+        <label for="booked_by">Gebucht von:</label>
+        <input type="text" name="booked_by" id="booked_by" required>
+        <button type="submit" name="action" value="add">Hinzufügen</button>
+    </form>
+
+</body>
+</html>

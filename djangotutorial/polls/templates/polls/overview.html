@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management System</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        /* Allgemeines CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            padding: 2em;
+            color: black;
+            text-align: center;
+            position: relative;
+            background-image: url('https://cdn.pixabay.com/photo/2017/07/12/21/43/architecture-2496154_1280.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        header h1, header p {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .reminder {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .reminder span {
+            background: red;
+            color: white;
+            font-size: 0.8em;
+            border-radius: 50%;
+            padding: 0.2em 0.4em;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+        }
+        .rms-link {
+            position: relative;
+            left: -80px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            padding: 0.5em;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        nav a {
+            color: white;
+            padding: 1em; /* Einheitliche Dicke */
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 1em;
+        }
+        nav a:hover {
+            background-color: #1e88e5;
+        }
+        .room {
+            border: 1px solid #ddd;
+            padding: 1em;
+            margin: 1em 0;
+            background-color: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .room h3 {
+            margin: 0;
+        }
+        .room-content {
+            flex: 1;
+        }
+        .extra-content {
+            display: none; /* Bilder und Details sind standardmäßig unsichtbar */
+            margin-top: 1em;
+            padding: 1em;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 60px;  /* Verringert den Abstand zwischen den Bildern */
+        }
+        .extra-content img:nth-child(2) {
+            margin-right: 40px;  /* Erhöhe den Abstand nach dem zweiten Bild */
+        }
+        .extra-content img {
+            width: 250px; /* Setzt die Bilder auf eine Breite von 30% */
+            height: 250px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        .toggle-btn {
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 1em;
+        }
+        .toggle-btn:focus {
+            outline: none;
+        }
+        .booking-btn {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            display: block;
+            margin-top: 1em;
+            margin-left: auto;
+        }
+        .booking-btn:hover {
+            background-color: #1565c0;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            margin-top: 8em; /* Abstand oberhalb des Fußbereichs */
+        }
+        footer p {
+            margin: 0;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Room Management System</h1>
+    <p>Effizientes Buchen und Verwalten von Räumen</p>
+    <div class="reminder" onclick="alert('Keine neuen Erinnerungen!')">
+        🔔 <span id="reminder-count">0</span>
+    </div>
+</header>
+<nav>
+    <a href="/polls/home">RMS</a>
+    <a href="/polls/index">System-Funktionen</a>
+    <a href="/polls/overview">Raumübersicht</a>
+    <a href="/polls/calendar">Terminplaner</a>
+    <a href="/polls/wishlist">Wunschliste</a>
+    <a href="#" onclick="openLoginModal()">Einloggen</a>
+</nav>
+
+<!-- Login-Modal -->
+<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2em; border-radius:8px; max-width:400px; width:100%;">
+        <h1>Login</h1>
+        <form action="/admin/" method="POST">
+        {% csrf_token %}
+            <input type="text" name="username" placeholder="Benutzername" required style="width:100%; margin-bottom:1em; padding:0.8em;">
+            <input type="password" name="password" placeholder="Passwort" required style="width:100%; margin-bottom:1em; padding:0.8em;">
+            <button type="submit" style="width:100%; padding:0.8em; background:#1e88e5; color:white; border:none; border-radius:4px;">Einloggen</button>
+        </form>
+        <button onclick="closeLoginModal()" style="margin-top:1em; background:#333; color:white; border:none; padding:0.5em 1em; border-radius:4px;">Schließen</button>
+    </div>
+</div>
+
+<script>
+    function openLoginModal() {
+        document.getElementById("login-modal").style.display = "flex";
+    }
+    function closeLoginModal() {
+        document.getElementById("login-modal").style.display = "none";
+    }
+</script>
+
+<section id="configurator" style="padding: 1em; background-color: #ffffff; margin-bottom: 1em; border-radius: 8px;">
+    <h2>Raum-Konfigurator</h2>
+    <form id="config-form">
+        <!-- Studiengang -->
+        <label for="study-program" style="font-size: 1em;">Studiengang:</label><br>
+        <select id="study-program" name="study_program" style="margin-bottom: 1em; padding: 0.5em; width: 100%; font-size: 1em;">
+            <option value="">Bitte auswählen</option>
+            <option value="Architektur">Architektur</option>
+            <option value="Bauingenieur">Bauingenieur</option>
+            <option value="Digitaler Baumeister">Digitaler Baumeister</option>
+            <option value="E2D">E2D</option>
+        </select><br>
+
+        <!-- Art des Raumes -->
+        <label for="room-type" style="font-size: 1em;">Art des Raumes:</label><br>
+        <select id="room-type" name="room_type" style="margin-bottom: 1em; padding: 0.5em; width: 100%; font-size: 1em;">
+            <option value="">Bitte auswählen</option>
+            <option value="Vorlesungsraum">Vorlesungsraum</option>
+            <option value="Computerraum">Computerraum</option>
+            <option value="Arbeitsraum">Arbeitsraum</option>
+            <option value="Lehrraum">Lehrraum</option>
+        </select><br>
+
+        <!-- Größe des Raums -->
+        <label for="room-size" style="font-size: 1em;">Größe des Raums:</label><br>
+        <select id="room-size" name="room_size" style="margin-bottom: 1em; padding: 0.5em; width: 100%; font-size: 1em;">
+            <option value="">Bitte auswählen</option>
+            <option value="15qm">15qm</option>
+            <option value="20qm">20qm</option>
+            <option value="30qm">30qm</option>
+        </select><br>
+
+        <!-- Raumausstattung -->
+        <label style="font-size: 1em;">Raumausstattung:</label><br>
+        <div style="margin-bottom: 1em; font-size: 1em;">
+            <label><input type="checkbox" class="equipment" value="Beamer" style="margin-right: 0.5em;">Beamer</label><br>
+            <label><input type="checkbox" class="equipment" value="White-Board" style="margin-right: 0.5em;">White-Board</label><br>
+            <label><input type="checkbox" class="equipment" value="Tische mit Rollen" style="margin-right: 0.5em;">Tische mit Rollen</label><br>
+            <label><input type="checkbox" class="equipment" value="Steckdosen an den Tischen" style="margin-right: 0.5em;">Steckdosen an den Tischen</label><br>
+            <label><input type="checkbox" class="equipment" value="Wlan" style="margin-right: 0.5em;">Wlan</label><br>
+            <label><input type="checkbox" class="equipment" value="Akustikdecke" style="margin-right: 0.5em;">Akustikdecke</label>
+        </div>
+
+        <!-- Absenden -->
+        <button type="button" class="booking-btn" style="width: 100%;" onclick="filterRooms()">Konfiguration anwenden</button>
+    </form>
+</section>
+
+<!-- Räume Bereich -->
+<section id="room-list" style="padding: 1em;">
+    <h2>Verfügbare Räume</h2>
+    <!-- Hier werden die Räume angezeigt -->
+</section>
+
+<script>
+    const availableRooms = [
+        {
+            type: "Computerraum",
+            size: "20qm",
+            equipment: ["Beamer", "White-Board", "Wlan"],
+            capacity: "20 Personen",
+            description: "Ein moderner Computerraum mit Platz für 20 Personen.",
+            image1: "/media/computerraum3.jpg",  // Erstes Bild
+            image2: "/media/computerraum2.jpg", // Zweites Bild
+            image3: "/media/computerraum.jpg" // Drittes Bild
+        },
+        {
+            type: "Hörsaal",
+            size: "30qm",
+            equipment: ["White-Board", "Tische mit klappbaren Stühlen", "Akustikdecke"],
+            capacity: "30 Personen",
+            description: "Ein großzügiger Vorlesungsraum mit modernster Ausstattung.",
+            image1: "/media/grundrissarbeitsraum.jpg",  // Erstes Bild
+            image2: "/media/vorlesungsraum2.jpg", // Zweites Bild
+            image3: "/media/vorlesungsraum.jpg" // Drittes Bild
+        },
+        {
+            type: "Arbeitsraum",
+            size: "15qm",
+            equipment: ["Wlan", "Steckdosen an den Tischen"],
+            capacity: "1 Person",
+            description: "Ein ruhiger Arbeitsraum mit allem, was Sie benötigen.",
+            image1: "/media/grundrisshörsaal.jpg",  // Erstes Bild
+            image2: "/media/hörsaal2.jpg", // Zweites Bild
+            image3: "/media/hörsaal.jpg" // Drittes Bild
+        },
+        // Neue Räume hinzufügen
+        {
+            type: "Lehrraum",
+            size: "30qm",
+            equipment: ["Beamer", "Akustikdecke"],
+            capacity: "25 Personen",
+            description: "Ein Raum für Lehrveranstaltungen mit umfangreicher Ausstattung.",
+        },
+        {
+            type: "Seminarraum",
+            size: "25qm",
+            equipment: ["White-Board", "Wlan"],
+            capacity: "15 Personen",
+            description: "Ein Raum für Seminare mit moderner Ausstattung.",
+        },
+        {
+            type: "Meetingraum",
+            size: "20qm",
+            equipment: ["Tische mit Rollen", "Steckdosen an den Tischen"],
+            capacity: "10 Personen",
+            description: "Ein kleiner Meetingraum, perfekt für Teamsitzungen.",
+            image1: "https://example.com/room3.jpg"
+        }
+    ];
+
+    function filterRooms() {
+        const roomType = document.getElementById('room-type').value;
+        const roomSize = document.getElementById('room-size').value;
+        const selectedEquipment = Array.from(document.querySelectorAll('.equipment:checked')).map(el => el.value);
+
+        const filteredRooms = availableRooms.filter(room => {
+            const matchesType = !roomType || room.type === roomType;
+            const matchesSize = !roomSize || room.size === roomSize;
+            const matchesEquipment = selectedEquipment.every(eq => room.equipment.includes(eq));
+            return matchesType && matchesSize && matchesEquipment;
+        });
+
+        // Räume anzeigen
+        const roomsList = document.getElementById('room-list');
+        roomsList.innerHTML = ''; // Alte Räume zurücksetzen
+
+        filteredRooms.forEach(room => {
+            const roomElement = createRoomElement(room);
+            roomsList.appendChild(roomElement);
+        });
+    }
+
+    function createRoomElement(room) {
+        const roomElement = document.createElement('div');
+        roomElement.classList.add('room');
+        
+        roomElement.innerHTML = `
+            <div class="room-content">
+                <h3>${room.type}</h3>
+                <p>Kapazität: ${room.capacity}</p>
+                <p>Ausstattung: ${room.equipment.join(', ')}</p>
+                <p>${room.description}</p>
+            </div>
+            <div class="extra-content">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
+                    <!-- Drei unterschiedliche Bilder hier anzeigen -->
+                    <img src="${room.image1}" alt="Raumbild 1">
+                    <img src="${room.image2}" alt="Raumbild 2">
+                    <img src="${room.image3}" alt="Raumbild 3">
+                </div>
+                <button class="booking-btn">Buchen</button>
+            </div>
+            <button class="toggle-btn" onclick="toggleImages(this)">+</button>
+        `;
+
+        return roomElement;
+    }
+
+    function toggleImages(button) {
+        const extraContent = button.closest('.room').querySelector('.extra-content');
+        const isVisible = extraContent.style.display === 'block';
+        extraContent.style.display = isVisible ? 'none' : 'block';
+        button.textContent = isVisible ? '+' : '−';
+    }
+
+    filterRooms(); // Initialer Filteraufruf
+</script>
+
+<footer>
+    <p>&copy; 2025 Room Management System. Alle Rechte vorbehalten.</p>
+</footer>
+</body>
+</html>

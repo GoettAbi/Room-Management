@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMS - Room Management System</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            padding: 2em;
+            color: black;
+            text-align: center;
+            position: relative;
+            background-image: url('https://cdn.pixabay.com/photo/2017/07/12/21/43/architecture-2496154_1280.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        header h1, header p {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .reminder {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .reminder span {
+            background: red;
+            color: white;
+            font-size: 0.8em;
+            border-radius: 50%;
+            padding: 0.2em 0.4em;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            padding: 0.5em;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        nav a {
+            color: white;
+            padding: 1em;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            background-color: #1e88e5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1em;
+        }
+        #features {
+            padding: 3em 1em;
+            text-align: center;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 2em 0;
+            border-radius: 8px;
+        }
+        #features h2 {
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            color: #1e88e5;
+        }
+        #features ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        #features li {
+            font-size: 1.2em;
+            padding: 1em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 1em;
+            transition: background-color 0.3s ease;
+        }
+        #features li:hover {
+            background-color: #e3f2fd;
+        }
+        .gallery {
+            display: flex;
+            justify-content: center;
+            gap: 2em;
+            margin-top: 2em;
+        }
+        .gallery img {
+            width: 30%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .gallery img:hover {
+            transform: scale(1.05);
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        footer p {
+            margin: 0;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Room Management System</h1>
+    <p>Effizientes Buchen und Verwalten von Räumen</p>
+    <div class="reminder" onclick="alert('Keine neuen Erinnerungen!')">
+        🔔 <span id="reminder-count">0</span>
+    </div>
+</header>
+<nav>
+    <a href="/polls/home" class="rms-link">RMS</a>
+    <a href="#features">System-Funktionen</a>
+    <a href="/polls/overview">Raumübersicht</a>
+    <a href="/polls/calendar">Terminplaner</a>
+    <a href="/polls/wishlist">Wunschliste</a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}">Abmelden</a>
+    {% else %}
+        <a href="#" onclick="openLoginModal()">Einloggen</a>
+    {% endif %}
+</nav>
+
+<!-- Login-Modal -->
+<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2em; border-radius:8px; max-width:400px; width:100%;">
+        <h1>Login</h1>
+        <form action="{% url 'admin:index' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Benutzername" required style="width:100%; margin-bottom:1em; padding:0.8em;">
+            <input type="password" name="password" placeholder="Passwort" required style="width:100%; margin-bottom:1em; padding:0.8em;">
+            <button type="submit" style="width:100%; padding:0.8em; background:#1e88e5; color:white; border:none; border-radius:4px;">Einloggen</button>
+        </form>
+        <button onclick="closeLoginModal()" style="margin-top:1em; background:#333; color:white; border:none; padding:0.5em 1em; border-radius:4px;">Schließen</button>
+    </div>
+</div>
+
+<script>
+    function openLoginModal() {
+        const modal = document.getElementById("login-modal");
+        if (modal) modal.style.display = "flex";
+    }
+    function closeLoginModal() {
+        const modal = document.getElementById("login-modal");
+        if (modal) modal.style.display = "none";
+    }
+</script>
+
+<section id="features">
+    <h2>System-Funktionen</h2>
+    <ul>
+        <li>Intelligente Raumbuchung</li>
+        <li>Echtzeit-Raumauslastung</li>
+        <li>Personalisierte Raumeinstellungen</li>
+        <li>Analyse und Berichtsfunktionen zur Optimierung der Nutzung</li>
+    </ul>
+    <div class="gallery">
+        <img src="https://www.gebaeudedigital.de/wp-content/uploads/sites/11/2019/08/web_161748_Space-Sense_Auslastung-der-Anlage-1024x576.jpg" alt="Raumbuchung">
+        <img src="https://fastercapital.com/de/i-de/Umfassender-Leitfaden-zur-Auswahl-der-richtigen-Marketingplattform--Analyse-von-Daten-und-Berichtsfunktionen.webp" alt="Raumauslastung">
+        <img src="https://www.signamedia.de/wp-content/uploads/2021/03/room-manager-raumbuchungssystem-06.jpg" alt="Raumeinstellungen">
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 Room Management System. Alle Rechte vorbehalten.</p>
+    <p>&copy; Digitaler Baumeister / Computer Science </p>
+    <p>&copy; Lars Moosrainer / Leon Göttinger</p>
+</footer>
+</body>
+</html>

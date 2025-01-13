@@ -1,0 +1,304 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        .day, .header {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .header {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .available {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .booked {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .day {
+            cursor: pointer;
+        }
+
+        .day:hover {
+            opacity: 0.8;
+        }
+
+        .month-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            margin: 0 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .arrow:hover {
+            color: #007BFF;
+        }
+
+        /* Modal-Stil für E-Mail Eingabe */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2em;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal input {
+            padding: 0.8em;
+            width: 80%;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal button {
+            padding: 0.8em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal .close-btn {
+            background-color: #dc3545;
+            margin-top: 1em;
+        }
+
+        .modal .close-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Buttons unter dem E-Mail Eingabefeld */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .button-container button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 1em;
+            font-size: 1rem;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="month-navigation">
+        <span class="arrow" id="prev-month">&#8592;</span>
+        <h1 id="month-year">Kalender für Dezember 2024</h1>
+        <span class="arrow" id="next-month">&#8594;</span>
+    </div>
+
+    <div class="calendar">
+        <!-- Kalenderkopf -->
+        <div class="header">Mo</div>
+        <div class="header">Di</div>
+        <div class="header">Mi</div>
+        <div class="header">Do</div>
+        <div class="header">Fr</div>
+        <div class="header">Sa</div>
+        <div class="header">So</div>
+    </div>
+
+    <!-- Modal für E-Mail Eingabe -->
+    <div class="modal" id="email-modal">
+        <div class="modal-content">
+            <h2>Gib deine E-Mail-Adresse ein</h2>
+            <input type="email" id="email-input" placeholder="E-Mail-Adresse" required>
+            
+            <!-- Buttons unterhalb des Eingabefelds -->
+            <div class="button-container">
+                <button onclick="submitEmail()">Bestätigen</button>
+                <button class="close-btn" id="close-modal-btn" onclick="closeModal()">Schließen</button>
+            </div>
+            
+            <p id="confirmation-message" style="display: none; margin-top: 10px; color: green;">Der Termin muss per E-Mail bestätigt werden. Vielen Dank für deine Buchung!</p>
+        </div>
+    </div>
+
+    <script>
+        // Kalenderdaten
+        const calendar = document.querySelector('.calendar');
+        const monthYear = document.getElementById('month-year');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const emailModal = document.getElementById('email-modal');
+        const emailInput = document.getElementById('email-input');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        const bookedDaysPerMonth = {
+            0: [10, 20, 25, 21, 7], // Januar
+            1: [5, 14, 28],  // Februar
+            2: [1, 15, 31],  // März
+            3: [7, 12, 22],  // April
+            4: [3, 8, 30],   // Mai
+            5: [4, 9, 18],   // Juni
+            6: [6, 20, 26],  // Juli
+            7: [1, 15, 21],  // August
+            8: [5, 19, 27],  // September
+            9: [3, 17, 23],  // Oktober
+            10: [2, 11, 20], // November
+            11: [3, 5, 24, 12, 21]   // Dezember
+        };
+
+        const months = [
+            'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+            'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+        ];
+
+        let currentYear = 2024;
+        let currentMonth = 11; // Dezember (0-basiert)
+
+        // Funktion zur Erstellung des Kalenders
+        function createCalendar(month, year) {
+            calendar.innerHTML = ''; // Kalender leeren
+
+            // Monatsname und Jahr aktualisieren
+            monthYear.textContent = `Kalender für ${months[month]} ${year}`;
+
+            // Erster Tag des Monats ermitteln
+            const firstDay = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Belegte Tage für den aktuellen Monat
+            const bookedDays = bookedDaysPerMonth[month] || [];
+
+            // Tage hinzufügen
+            for (let day = 1; day <= totalDays; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('day');
+                dayCell.textContent = day;
+
+                if (bookedDays.includes(day)) {
+                    dayCell.classList.add('booked');
+                    dayCell.textContent += " (belegt)";
+                } else {
+                    dayCell.classList.add('available');
+                    dayCell.textContent += " (frei)";
+                }
+
+                // Klickaktion (z. B. Buchung)
+                dayCell.addEventListener('click', () => {
+                    if (dayCell.classList.contains('available')) {
+                        emailModal.style.display = 'flex';  // Modal anzeigen
+                    } else {
+                        alert(`Tag ${day} ist bereits belegt.`);
+                    }
+                });
+
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        // Event-Listener für Navigation
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            createCalendar(currentMonth, currentYear);
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            createCalendar(currentMonth, currentYear);
+        });
+
+        // Funktion zum Einreichen der E-Mail
+        function submitEmail() {
+            const email = emailInput.value;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (emailPattern.test(email)) {
+                emailInput.disabled = true;  // Eingabefeld sperren
+                confirmationMessage.style.display = 'block';  // Bestätigungsmeldung anzeigen
+            } else {
+                alert("Bitte eine gültige E-Mail-Adresse eingeben.");
+            }
+        }
+
+        // Funktion zum Schließen des Modals
+        function closeModal() {
+            emailModal.style.display = 'none';  // Modal schließen
+            emailInput.disabled = false;  // Eingabefeld zurücksetzen
+            emailInput.value = '';  // E-Mail-Feld leeren
+            confirmationMessage.style.display = 'none';  // Bestätigungsmeldung zurücksetzen
+        }
+
+        // Initialer Kalender
+        createCalendar(currentMonth, currentYear);
+    </script>
+
+    <link rel="stylesheet" href="{% static 'polls/css/style.css' %}">
+</body>
+</html>

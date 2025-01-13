@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+        .login-container input {
+            width: 100%;
+            padding: 0.8em;
+            margin-bottom: 1em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 0.8em;
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .login-container button:hover {
+            background-color: #1565c0;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1em;
+            color: #333;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form action="admin_dashboard.html" method="POST"> <!-- Zielseite -->
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Benutzername" required>
+            <input type="password" name="password" placeholder="Passwort" required>
+            <button type="submit">Login</button>
+        </form>
+        <a href="index.html" class="back-link">Zurück zur Hauptseite</a>
+    </div>
+<footer>
+    <p>&copy; 2025 Room Management System. Alle Rechte vorbehalten.</p>
+    <p>&copy; Digitaler Baumeister / Computer Science </p>
+    <p>&copy; Lars Moosrainer / Leon Göttinger</p>
+</footer>
+</body>
+</html>

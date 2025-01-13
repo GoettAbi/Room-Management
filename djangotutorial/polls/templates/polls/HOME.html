@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management System - Home</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: white;
+        }
+        header {
+            color: black;
+            text-align: center;
+            padding: 6em 1em;
+            background: rgba(255, 255, 255, 0.5); /* Halbtransparenter Hintergrund für Header */
+            position: relative;
+        }
+        header h1 {
+            font-size: 3.5em;
+            margin: 0;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+        }
+        header p {
+            font-size: 1.8em;
+            margin: 1em 0;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        }
+        .buttons {
+            margin-top: 8em;
+        }
+        .button {
+            display: inline-block;
+            background-color: #ff5722;
+            color: white;
+            padding: 1em 2em;
+            margin: 0 1em;
+            text-decoration: none;
+            font-size: 1.2em;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #e64a19;
+        }
+        section {
+            padding: 3em 1em;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        section h2 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 1.5em;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5em;
+        }
+        .gallery img {
+            width: 30%; /* Bilder breiter */
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .gallery img:hover {
+            transform: scale(1.1); /* Hover-Effekt für Bilder */
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1.5em;
+            position: relative;
+            margin-top: 3em;
+        }
+        footer p {
+            margin: 0;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Willkommen im Room Management System</h1>
+        <p>Effizientes Buchen und Verwalten Ihrer Räume – alles an einem Ort</p>
+        <div class="buttons">
+            <a href="/polls/index/" class="button">System-Funktionen</a>
+            <a href="/polls/overview/" class="button">Raumübersicht</a>
+            <a href="/polls/calendar/" class="button">Terminplaner</a>
+            <a href="/polls/wishlist/" class="button">Wunschliste</a>
+        
+        </div>
+
+
+    </header>
+    <section>
+        <h2>Entdecken Sie, was unser System bietet</h2>
+        <div class="gallery">
+            <img src="https://www.startup-report.de/wp-content/uploads/2023/04/Meetingraum-der-Zukunft.jpg" alt="Moderner Konferenzraum">
+            <img src="https://www.startup-report.de/wp-content/uploads/2023/04/Meetingraum-der-Zukunft-modern-ausgestattet.jpg" alt="Besprechungsraum">
+            <img src="https://www.add-on.com/wp-content/uploads/2023/09/AdobeStock_626832804-scaled.jpeg" alt="Arbeitsbereich">
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2025 Room Management System. Alle Rechte vorbehalten.</p>
+        <p>&copy; Digitaler Baumeister / Computer Science </p>
+        <p>&copy; Lars Moosrainer / Leon Göttinger</p>
+    </footer>
+</body>
+</html>
+
